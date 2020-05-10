@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Chat Application</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/css/materialize.min.css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+   <link href="https://fonts.googleapis.com/css?family=Jomhuria|Suez+One" rel="stylesheet"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+</head>
+
+<style>
+
+  * {
+    margin: 0px;
+    padding: 0px;
+    box-sizing: border-box;
+  }
+
+  body {
+    max-height: 150vh;
+    overflow-y: hidden;
+  }
+
+  .my-light {
+    font-size: .6em;
+  }
+
+  #msg-cont {
+      position: relative;
+      box-sizing: border-box;
+      height: 80vh;
+  }
+
+  form {
+    height: 100%;
+  }
+
+  .my-form {    
+    position: absolute;
+    width: 100%;
+    height: 20%;
+    bottom: 0;
+  }
+  
+  .my-form-bottom {
+    top: 0;
+    left: 0;
+  }
+
+  .my-msgs {
+    padding: 3px;
+    height: 80%;
+    overflow-y: auto; 
+  }
+
+  .my-msg {
+    padding: 1px;
+    font-family: Serif;
+    font-size: 1em;
+    color: black;
+  }
+
+  .my-left-nav {
+    height: 100vh;
+  }
+
+  .main-bar {
+    padding-top: 10px;
+  }
+  .msg_nick {
+    font-size: 1.0em;
+  }
+* {
+   font-family: 'Suez One', serif;
+  }
+
+  div#con_mems {
+    font-size: 0.9em;
+    font-family: 'Suez One', serif;
+    color: white;
+  }
+  div>ul>li {
+    font-family: 'Suez One', serif;
+    font-size: 0.7em;
+  }
+  div.mems {
+    overflow-y: auto;
+    height: 50vh;
+    padding-left: 10px;
+  }
+
+</style>
+
+<body class="grey lighten-4">
+  <div class="row">
+<!-- Left navigation bar -->
+    <div class="white-text flow-text z-depth-1 my-left-nav light-blue darken-4 col l2 s3">
+        <div class="main-bar">
+          <div style="height:20vh;">
+            <form id="nick-form" action="">
+              <div>
+                Enter your name
+                <input 
+                  placeholder="Name"
+                  type="text"
+                  id="nick">
+              </div>
+            </form>
+            <!-- Shown to ppl with nick -->
+            <div id="helloMsg" class="materialize-textarea" name="" cols="30" rows="10">Hello <span id='name'>Clear!</span>, start chatting!</div>
+           </div>
+          <div style="padding-top:10vh"></div>
+          <div id="con_mems">
+            Connected members
+            <div style="padding-top:5vh;"></div>
+            <div class="divider"></div>
+            <div class="mems">
+              <div style="padding-top:5vh;"></div>
+              <ul id="all_mems">
+                <li id="a_mem">Harsh</li>
+              </ul>
+            </div>
+          </div>
+      </div>
+    </div>  
+    
+    <div class="col s9 l10">
+<!-- Top navigation bar -->
+      <nav class='lighten-4 z-depth-0 grey container'>
+        <div class="nav-wrapper ">
+         <span class="brand-logo left black-text text-darken-1">Async-Chat Application 
+            <span class="my-light black-text text-lighten-4">  
+          </span>
+        </div>
+      </nav>
+
+<!-- Small padding from heading to chat box (could be improved) -->
+      <div style="height:20px">
+      </div>
+
+<!-- Chat box which contains everything -->
+      <div id="msg-cont" class="z-depth-0 container  lighten-2"> 
+<!-- Message box in Chat which has all the messages -->
+        <div class="my-msgs grey lighten-4">
+          <ul id="msgs"> 
+            <li id="msg" class="my-msg flow-text">
+              <span class="msg_nick" id="msg_nick">Harsh
+              </span>:
+            <span id="msg_cont">
+              Hi, How are you? 
+            </span>
+            </li>
+          </ul>
+        </div>
+        <div class="my-form z-depth-0">
+          <div class="divider"></div>
+          <form id="text" action="">
+            <div class="input-field">
+              <input id="text_msg" 
+                     type="text">
+              <label class="active" for="text_msg">Enter Text</label>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Javascript starts below -->  
+  <script src="https://code.jquery.com/jquery-3.1.0.min.js" crossorigin="anonymous"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    $('#helloMsg').hide();
+    $(document).ready(function() {
+      let my_nick = 'no one said';
+      const all_colors = ['red','green', 'blue', 'purple', 'orange', 'indigo', 'brown'];
+      const my_color = all_colors[Math.floor(Math.random()*10)];
+      console.log(my_color);
+      var socket = io()
+      setInterval(function() {
+        heading.text('Rocket doom distract '+a.toString());
+        a++;
+      }, 1000);
+      $('#nick-form').submit(function() {
+        my_nick = $('#nick').val();
+        $('#nick-form').hide();
+        socket.emit('new-user', my_nick);
+        $('#helloMsg').show();
+        $('#name').text(my_nick);
+        return false;
+      });
+      $('#text').submit(function() {
+        msg = $('#text_msg').val();
+        json_msg = JSON.stringify({name:my_nick,the_msg:msg,col:my_color}); 
+        socket.emit('got-a-text', json_msg);
+        $('#text_msg').val('');
+        return false;
+      });
+      socket.on('new-user', function(msg) {
+         let mem_block = $('#a_mem').clone();
+         console.log('Message ' + msg);
+         mem_block.attr('id',msg);
+         mem_block.text(msg).appendTo($('#all_mems'));
+      });
+      socket.on('a-user-disc', function(msg) {
+        $('#'+msg).remove();
+      });
+      socket.on('got-a-text', function(msg) {
+        json_msg = JSON.parse(msg);
+        console.log(json_msg);
+        let new_msg_block = $('#msg').clone();
+        new_msg_block.find('#msg_cont').text(json_msg.the_msg);
+        new_msg_block.find('#msg_nick')
+          .text(json_msg.name)
+          .css({'color':json_msg.col});
+        new_msg_block.appendTo($('#msgs'));
+        $('.my-msgs').scrollTop($('#msgs')[0].scrollHeight);
+      });
+      Materialize.updateTextFields();
+    });
+  </script>
+</body>
+</html>

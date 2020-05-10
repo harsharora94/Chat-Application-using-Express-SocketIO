@@ -1,0 +1,1 @@
+# The Web application is intended for chatting. 
